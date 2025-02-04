@@ -103,9 +103,9 @@ pipeline {
                 script {
                     echo "Sending Notifications..."
                     // Add your Slack or Email notification logic here
-                    slackSend(channel: '#build-notifications', message: "Build completed successfully!")
+                    slackSend(channel: '#general', message: "Build completed successfully!")
                     // If using email notifications, configure as needed
-                    emailext subject: 'Build Status', body: 'The build has been completed!', to: 'example@example.com'
+                    emailext subject: 'Build Status', body: 'The build has been completed!', to: 'mtharik121@gmail.com'
                 }
             }
         }
