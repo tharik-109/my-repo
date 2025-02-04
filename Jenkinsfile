@@ -2,127 +2,77 @@ pipeline {
     agent any
 
     environment {
-        SONARQUBE = 'SonarQube'
-        GRADLE_HOME = '/usr/local/gradle'  // Update if necessary
+        SKIP_CODE_STABILITY = "${params.SKIP_CODE_STABILITY}"
+        SKIP_QUALITY_ANALYSIS = "${params.SKIP_QUALITY_ANALYSIS}"
+        SKIP_COVERAGE_ANALYSIS = "${params.SKIP_COVERAGE_ANALYSIS}"
+    }
+
+    parameters {
+        booleanParam(name: 'SKIP_CODE_STABILITY', defaultValue: false, description: 'Skip Code Stability Check')
+        booleanParam(name: 'SKIP_QUALITY_ANALYSIS', defaultValue: false, description: 'Skip Code Quality Analysis')
+        booleanParam(name: 'SKIP_COVERAGE_ANALYSIS', defaultValue: false, description: 'Skip Code Coverage Analysis')
     }
 
     stages {
-        stage('Checkout SCM') {
-            steps {
-                checkout scm
-            }
-        }
-
         stage('Code Checkout') {
             steps {
-                echo "Checking out code from repository..."
-                script {
-                    // Ensure gradle wrapper exists
-                    if (!fileExists('./gradlew')) {
-                        error "Gradle wrapper 'gradlew' is missing!"
-                    }
-                }
+                git branch: 'main', url: 'https://github.com/user/DemoProject.git'
             }
         }
 
-        stage('Build Project') {
-            steps {
-                script {
-                    echo "Running Gradle build task..."
-                    sh './gradlew build'
-                }
-            }
-        }
-
-        stage('Run Scans in Parallel') {
+        stage('Parallel Scans') {
             parallel {
                 stage('Code Stability') {
+                    when { expression { return SKIP_CODE_STABILITY.toBoolean() == false } }
                     steps {
-                        echo "Running Code Stability Checks..."
-                        script {
-                            // Add your stability checks here
-                            sh './gradlew check'
-                        }
+                        sh 'mvn clean compile'
                     }
                 }
-
                 stage('Code Quality Analysis') {
+                    when { expression { return SKIP_QUALITY_ANALYSIS.toBoolean() == false } }
                     steps {
-                        echo "Running Code Quality Analysis with SonarQube..."
-                        script {
-                            // Ensure SonarQube is configured in Gradle
-                            sh './gradlew sonarqube'
-                        }
+                        sh 'mvn spotbugs:check'
                     }
                 }
-
-                // Removed Code Coverage Analysis (Jacoco)
             }
         }
 
         stage('Generate Report') {
             steps {
-                script {
-                    echo "Generating Reports..."
-                    // Make sure reports are generated
-                    if (fileExists('build/reports')) {
-                        sh 'cp build/reports/* /var/lib/jenkins/workspace/Java-CI-Pipeline/'
-                    } else {
-                        echo "Reports not found, skipping report generation."
-                    }
-                }
+                sh 'mvn site'
+                archiveArtifacts artifacts: '**/target/site/*', fingerprint: true
             }
         }
 
         stage('Publish Artifacts') {
             steps {
-                script {
-                    echo "Publishing Artifacts..."
-                    // Check if the reports exist before publishing
-                    if (fileExists('build/libs')) {
-                        // Add artifact publishing logic here
-                        archiveArtifacts artifacts: 'build/libs/*.jar', allowEmptyArchive: true
-                    } else {
-                        echo "No artifacts found to publish."
-                    }
-                }
+                sh 'mvn package'
+                archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
             }
         }
 
         stage('Approval Before Release') {
             steps {
                 script {
-                    echo "Waiting for approval before release..."
-                    input message: 'Approve Release?', ok: 'Approve', submitter: 'admin'  // Update approver as necessary
+                    def userInput = input(message: 'Approve Release?', parameters: [booleanParam(defaultValue: false, description: 'Approve Release?', name: 'APPROVE')])
+                    if (userInput) {
+                        echo "Release Approved. Proceeding with publishing..."
+                    } else {
+                        error "Release Denied!"
+                    }
                 }
             }
         }
 
-        stage('Notify Users') {
+        stage('Send Notifications') {
             steps {
                 script {
-                    echo "Sending Notifications..."
-                    // Add your Slack or Email notification logic here
-                    slackSend(channel: '#general', message: "Build completed successfully!")
-                    // If using email notifications, configure as needed
-                    emailext subject: 'Build Status', body: 'The build has been completed!', to: 'mtharik121@gmail.com'
+                    slackSend channel: '#ci-notifications', message: "Pipeline execution completed successfully."
+                    emailext subject: "Pipeline Execution Status",
+                             body: "Pipeline execution completed successfully.",
+                             to: "dev-team@example.com"
                 }
             }
-        }
-    }
-
-    post {
-        failure {
-            echo "Build failed! Sending failure notifications..."
-            // Send failure notifications (Slack, Email, etc.)
-            slackSend(channel: '#jenkins-notification', message: "Build failed!")
-            emailext subject: 'Build Failed', body: 'The build failed. Please check the Jenkins logs for more details.', to: 'mtharik121@gmail.com'
-        }
-        success {
-            echo "Build completed successfully!"
-            // Send success notifications
-            slackSend(channel: '#jenkins-notification', message: "Build succeeded!")
-            emailext subject: 'Build Success', body: 'The build has completed successfully!', to: 'mtharik121@gmail.com'
         }
     }
 }
