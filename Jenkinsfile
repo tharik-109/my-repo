@@ -115,14 +115,14 @@ pipeline {
         failure {
             echo "Build failed! Sending failure notifications..."
             // Send failure notifications (Slack, Email, etc.)
-            slackSend(channel: '#build-notifications', message: "Build failed!")
-            emailext subject: 'Build Failed', body: 'The build failed. Please check the Jenkins logs for more details.', to: 'example@example.com'
+            slackSend(channel: '#jenkins-notification', message: "Build failed!")
+            emailext subject: 'Build Failed', body: 'The build failed. Please check the Jenkins logs for more details.', to: 'mtharik121@gmail.com'
         }
         success {
             echo "Build completed successfully!"
             // Send success notifications
-            slackSend(channel: '#build-notifications', message: "Build succeeded!")
-            emailext subject: 'Build Success', body: 'The build has completed successfully!', to: 'example@example.com'
+            slackSend(channel: '#jenkins-notification', message: "Build succeeded!")
+            emailext subject: 'Build Success', body: 'The build has completed successfully!', to: 'mtharik121@gmail.com'
         }
     }
 }
