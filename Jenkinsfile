@@ -67,10 +67,10 @@ pipeline {
         stage('Send Notifications') {
             steps {
                 script {
-                    slackSend channel: '#ci-notifications', message: "Pipeline execution completed successfully."
+                    slackSend channel: 'jenkins-notification', message: "Pipeline execution completed successfully."
                     emailext subject: "Pipeline Execution Status",
                              body: "Pipeline execution completed successfully.",
-                             to: "dev-team@example.com"
+                             to: "mtharik121@gmail.com"
                 }
             }
         }
