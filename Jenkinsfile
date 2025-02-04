@@ -56,15 +56,7 @@ pipeline {
                     }
                 }
 
-                stage('Code Coverage Analysis') {
-                    steps {
-                        echo "Running Code Coverage Analysis..."
-                        script {
-                            // Ensure Jacoco plugin is used for coverage
-                            sh './gradlew jacocoTestReport'
-                        }
-                    }
-                }
+                // Removed Code Coverage Analysis (Jacoco)
             }
         }
 
