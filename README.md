@@ -1,4 +1,4 @@
-# Assignment-01: Load Balancer & Auto Scaling Group (H1)
+# Assignment-01: Load Balancer & Auto Scaling Group 
 
 Objective
 
@@ -8,9 +8,9 @@ Spring 3 Hibernate Repository:
 
 Spring 3 Hibernate GitHub Repository
 
-# Task Overview (H2)
+## Task Overview (H2)
 
-# 1. Infrastructure Design and Diagram Submission (H3)
+### 1. Infrastructure Design and Diagram Submission (H3)
 
 Design a comprehensive infrastructure diagram.
 
