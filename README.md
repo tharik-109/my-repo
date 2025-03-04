@@ -8,9 +8,9 @@ Spring 3 Hibernate Repository:
 
 Spring 3 Hibernate GitHub Repository
 
-Task Overview
+# Task Overview (H2)
 
-1. Infrastructure Design and Diagram Submission
+# 1. Infrastructure Design and Diagram Submission (H3)
 
 Design a comprehensive infrastructure diagram.
 
