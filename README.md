@@ -1,4 +1,4 @@
-**<big>Assignment-01: Load Balancer & Auto Scaling Group</big>**
+**Assignment-01: Load Balancer & Auto Scaling Group(H1)**
 
 Objective
 
