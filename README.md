@@ -1,4 +1,4 @@
-Assignment-01: Load Balancer & Auto Scaling Group
+**Assignment-01: Load Balancer & Auto Scaling Group**
 
 Objective
 
